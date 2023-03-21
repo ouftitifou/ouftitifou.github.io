@@ -1,0 +1,732 @@
+# version OAS
+openapi: 3.0.3
+
+
+#Comment/Heading
+# *italic*
+# **strong bold**
+# ***bold and italic***
+# links
+# [Link text] (link url)
+# ![Alt text] (image url)
+# # Heading1
+# ## Heading2
+# ### Heading3
+# _italic_
+# `surrounded`
+# ``` code ```
+# <u>blabla</u>
+
+# important links
+# www.openapis.org
+# swagger.io
+# editor.swagger.io
+# inspector.swagger.io
+# openapi-map.apihandyman.io
+# https://swapi.dev/
+# https://reqres.in/
+# https://www.json2yaml.com/
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Document metadata - General info about the API
+# ---------------------------------------------------------------------------------------------------------
+info:
+  title: Example product API Definition
+  description: |
+    # about us
+    ## about us
+    ### about us
+    Using this *OpenAPI* **specification**, any _consumer_ can ***understand the API*** that are exposed by `XXXXX`
+    # categories supporter
+    - mobiles
+      - iphone
+      - samsung
+    - laptops
+    - televisions
+    
+    ```
+      method1(){
+        
+      }
+    ```  
+  
+  termsOfService: https://example.com/terms/
+  contact:
+    name: API Support
+    url: https://www.example.com/support
+    email: support@example.com
+  license:
+    name: Example License 1.0
+    #identifier: XXX
+    url: https://www.example.com/licenses/LICENSE-2.0.html
+  version: 0.0.1
+
+  x-custom-info:
+    comment: Some comments
+    dev:
+      - name: John Doe
+        email: john@doe.be
+      - name: jane doe
+        email: jan@doe.be
+  
+externalDocs:
+  description: Find more info
+  url: https://www.google.be
+      
+# ---------------------------------------------------------------------------------------------------------
+# tags
+# ---------------------------------------------------------------------------------------------------------
+tags:
+  - name: Categories
+    description: Categories-related operations
+  - name: Products
+    description: Products-related operations
+  - name: Orders
+    description: Orders-related operations
+        
+security:
+  - BasicAuth: []
+  - BearerAuth: []
+  - ApiKeyAuth: []
+  - oAuth2AouthCode: 
+    - read
+    - write
+    - admin
+# ---------------------------------------------------------------------------------------------------------
+# Servers data
+# ---------------------------------------------------------------------------------------------------------
+servers:
+  - url: https://development.example-server.com/v1
+    description: Development server
+  - url: https://staging.example-server.com/v1
+    description: Staging server
+  - url: https://api.example-server.com/v1
+    description: Production server
+  - url: https://{username}.server.com:{port}/{version}
+    variables:
+      username:
+        default: demo
+        description: This value is assigned by the service provider.
+      port:
+        enum:
+          - "8443"
+          - "443"
+        default: "8443"
+      version:
+        default: v1
+
+# ---------------------------------------------------------------------------------------------------------
+# paths / describes all endpoints of the API, includes all parameters & server responses
+# ---------------------------------------------------------------------------------------------------------
+
+# -- integer
+#content:
+# appilication/json:
+#   schema:
+#     type: integer
+#     minimum: 10
+#     maximum: 100
+#-- string with enum
+#content:
+# appilication/json:
+#   schema:
+#     type: string
+#     enum: 
+#       - string1
+#       - string2
+# -- array
+#content:
+# appilication/json:
+#   schema:
+#     type: array
+#     mninItems: 1
+#     mnaxItems: 10
+#     items:
+#       type: integer
+# -- object
+# appilication/json:
+#   schema:
+#     type: object
+#     properties:
+#       productname:
+#         type: string
+#       productid:
+#         type: integer
+
+
+
+
+
+#paths: {} to not have en issue
+paths:
+  #endpoints
+  
+  #/endpoint:
+  /categories:
+    #method : example of method without parameters, return a list of object of type category
+    #get:
+    #  summary: List all categories
+    #  description: Return the list of categories
+    #  responses:
+    #    200:
+    #      description: Successfully Response. A list of all categories
+    #      content:
+    #        application/json: 
+    #          schema:
+    #            type: array #type of my schema
+    #            items: #explain each item of my array
+    #              type: object
+    #              properties:
+    #                categoryId:
+    #                  type: integer
+    #                  default: 1
+    #                name:
+    #                  type: string
+    #                  default: category one
+  
+    #/v1/categories?categoryId=1
+    get:
+      tags:
+        - Categories
+      summary: List all categories
+      description: Return the list of categories
+      
+      operationId: getCategories
+      security:
+        - BasicAuth: []
+      
+      externalDocs:
+        description: Find more info
+        url: https://www.google.be
+      
+      parameters: ###########################
+        - $ref: '#/components/parameters/categoryIdQueryParams'
+        
+      responses:
+        200:
+          description: Successfully Response. A list of all categories
+          content:
+            application/json: 
+              schema:
+                type: array #type of my schema
+                items: #explain each item of my array
+                  $ref: '#/components/schemas/Category'
+              examples:
+                all-categories-data:
+                  summary: Categories example data
+                  value: 
+                    - categoryId: 101
+                      name: Mobiles
+                    - categoryId: 102
+                      name: Laptops
+                    - categoryId: 103
+                      name: Headphones
+                single-categories-data: 
+                  summary: Single category example data
+                  value: 
+                    - categoryId: 101
+                      name: Mobiles
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+          
+  # /V1/categories/101
+  /categories/{categoryId}:
+    get:
+      tags:
+        - Categories
+      summary: example with variable in the path. Return one category - category details
+      description: example with variable in the path
+      operationId: getCategoryDetails
+      security: [] #no security for this method
+      
+      parameters:
+        - name: categoryId
+          in: path
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          required: true
+          example: 102
+      responses:
+        '200':
+          description: Successfully Response. Return one category
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  categoryId:
+                    type: integer
+                    default: 101
+                  name:
+                    type: string
+                    default: category one zero one
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+        
+        
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Return a list of products
+      description: Return a list of products in categories
+      operationId: getProducts
+      
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          required: false
+          example: 101
+      responses:
+        200:
+          description: Successfully Response. A list of all products
+          content:
+            application/json: 
+              schema:
+                type: array #type of my schema
+                items: #explain each item of my array
+                  $ref: '#/components/schemas/Product'
+        '500':  
+          $ref: '#/components/responses/InternalServerError'          
+  
+  /products/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Return one product - product details
+      description: Return one product
+      operationId: getProductDetails
+      
+      parameters:
+        - name: productId
+          in: path
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          required: true
+          example: 102
+      responses:
+        '200':
+          description: Successfully Response. Return one category
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  productId:
+                    type: integer
+                    example: 101
+                  name:
+                    type: string
+                    example: product
+                  price:
+                    type: number
+                    format: float
+                    example: 750.99
+                  categoryName:
+                    type: string
+                    example: Mobile
+                  quantity: 
+                    type: integer
+                    example: 1   
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+            
+  /orders:
+    post:
+      tags:
+        - Orders
+      summary: Create order
+      description: Post order details for processing and shipping
+      operationId: saveOrderDetails
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Product'
+                address:
+                  $ref: '#/components/schemas/Address'  
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+          links:
+            GetOrderByOrderId:
+              $ref: '#/components/links/GetOrderByOrderId'
+          
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+                    
+    put:
+      tags:
+        - Orders
+      summary: Update order
+      description: Update order details for processing and shipping
+      operationId: updateOrderDetails
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderID:
+                  type: integer
+                products:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Product'
+                address:
+                  $ref: '#/components/schemas/Address'  
+      responses:
+        '200':
+          description: Order updated successfully
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+          
+    delete:
+      tags:
+        - Orders
+      summary: Delete order
+      description: Delete order details
+      operationId: deleteOrderDetails
+      
+      parameters:
+        - $ref: "#/components/parameters/orderIdQueryParams"
+            
+      responses:
+        '204':
+          description: Order details cancelled successfully
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+          
+    get:
+      tags:
+        - Orders
+      summary: Return the order details
+      description: Return order details
+      operationId: getOrderDetails
+      
+      parameters:
+        - $ref: "#/components/parameters/orderIdQueryParams"
+      responses:
+        '200':
+          description: Successfully Response. Return the order details
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  orderID:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'   
+                  address:
+                    $ref: '#/components/schemas/Address'   
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+  
+  /OneOfOrders:
+    post:
+      tags:
+        - Orders
+      summary: Insert One of the order details
+      description: Insert One of the order details
+      operationId: demoOfOneOf
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: object
+                  oneOf: #l'un ou l'autre, pas les 2
+                    -  $ref: '#/components/schemas/Mobile'
+                    -  $ref: '#/components/schemas/Laptop'
+                address:
+                  $ref: '#/components/schemas/Address' 
+              required:
+                - products
+                - address
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+  
+  /AnyOfOrders:
+    get:
+      tags:
+        - Orders
+      summary: Get order details
+      description: Get order details based on Order ID
+      
+      operationId: demoOfAnyOf
+      
+      parameters:
+        - $ref: '#/components/parameters/orderIdQueryParams'
+        - name: fetchType
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: 
+              - summary
+              - details
+          description: > 
+            Fetch type: 
+              * `summary` - will provide order summary
+              * `details` - will provide order summary & Order Address
+                
+              
+      responses:
+        '200':
+          description: Return order details
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/OrderSummary'
+                  - $ref: '#/components/schemas/OrderAddress'
+                       
+  /orders/{orderId}:
+     get:
+      tags:
+        - Orders
+      summary: Return the order details based on orderid
+      description: Return order details based on orderid
+      operationId: getOrderDetailsPathParams
+      deprecated: true
+      
+      parameters:
+        - $ref: "#/components/parameters/orderIdPathParameter"
+      responses:
+        '200':
+          description: Successfully Response. Return the order details
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  orderID:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'   
+                  address:
+                    $ref: '#/components/schemas/Address'   
+        '500':  
+          $ref: '#/components/responses/InternalServerError'
+  
+components:
+  parameters:
+    orderIdQueryParams:
+      name: orderId
+      in: query
+      schema:
+        type: integer
+      required: false
+    
+    orderIdPathParameter:
+      name: orderId
+      in: path
+      schema:
+        type: integer
+      required: true
+      
+    categoryIdQueryParams:
+      name: categoryId
+      in: query #path, query, header, cookie
+      schema:
+        type: integer
+        minimum: 100
+        maximum: 1000
+      required: false
+      examples: 
+        mobiles:
+          summary: use this example for mobiles
+          value: 101
+        laptops:
+          value: 102
+        cameras:
+          value: 103
+        headphones:
+          value: 104  
+  
+  schemas:
+    Address:
+      type: object
+      properties:
+        addressline:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+          enum:
+            - California
+            - Texas
+            - Indiana
+            - NewYork
+        zipCode:
+          type: string 
+        isOfficeAddress:
+          type: boolean
+      required: [addressline, city, state, zipCode]
+    
+    Product:
+      type: object
+      properties:
+        productId:
+          type: integer
+          example: 101
+        name:
+          type: string
+          example: product
+        price:
+          type: number
+          format: float
+          example: 750.99
+        categoryName:
+          type: string
+          example: Mobile
+          nullable: true
+        releaseDate:
+          type: string
+          format: date
+          readOnly: true #only in the response not in the request
+        exampleDate: 
+          type: string
+          format: date-time
+          writeOnly: true
+        quantity: 
+          type: integer
+          description: |
+            *** Quantity*** represents `stock` value *blabla* <u>blabla</u>
+            it will be visible in the schema
+          example: 1
+          
+    Mobile:
+      allOf: #object product + param network
+        - $ref: '#/components/schemas/Product'
+        - type: object
+          properties:
+            networkType:
+              type: string
+              enum:
+                - 4G
+                - 5G
+          required: [networkType]
+    
+    Laptop:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - type: object
+          properties:
+            ram: 
+              type: string
+              enum: 
+                - 8 GB
+                - 16 GB
+                - 32 GB
+              required: [ram]
+    
+    Category:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          default: 101
+        name:
+          type: string
+          default: category one zero one
+    
+    OrderSummary:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+            
+    OrderAddress:
+      type: object
+      properties:
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+    
+  responses:
+    InternalServerError:
+      description: |
+        An error occured while processing the request.
+        Please contact support@example.be
+        
+  links:
+    GetOrderByOrderId:
+      description: >
+        The `orderId` value returned in the response can be used as input parameter in `GET /orders`
+      operationId: getProductDetails
+      parameters:
+        orderID: '$response.body#/orderId'
+        
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http 
+      scheme: bearer
+      bearerFormat: JWT #json web token
+    ApiKeyAuth:
+      type: apiKey
+      in: header 
+      name: X-API-KEY
+    oAuth2AouthCode:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/api/oauth
+          scopes:
+            read: Readonly access
+            write: Read Write access
+            admin: admin access
+            
+    
+  
+  
+        
